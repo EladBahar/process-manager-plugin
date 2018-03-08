@@ -50,7 +50,7 @@ namespace com.overwolf.net {
     public ProcessManager() {
       _dll_location =
         Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-    }
+    } 
 
     // a global event that triggers with two parameters:
     //
@@ -65,17 +65,14 @@ namespace com.overwolf.net {
         bool hidden, Action<object> callback) {
       Task.Run(() => {
         try {
-
-          callback(new { data = "Launching" });
-          callback(new { data = "Launching2" });
           string fullPath = string.Empty;
           if (!IsPathExists(path, out fullPath)) {
-            callback(new { status = "error", error = "can't find path" });
+            callback(new { error = "can't find path" });
             return;
           }
 
-          callback(new { data = "Full Path" });
           Process process = new Process();
+
           process.StartInfo.UseShellExecute = false;
           process.StartInfo.FileName = fullPath;
           process.StartInfo.Arguments = arguments;
@@ -88,27 +85,19 @@ namespace com.overwolf.net {
             try {
              var jsonObject = JObject.Parse(environmentVariables.ToString());
              foreach (var item in jsonObject) {
-               
                process.StartInfo.EnvironmentVariables[item.Key] = (string)item.Value;
              }
-
             } catch {
-              // TODO:
+              callback(new { error = "can't set environment variables" });
+              return;
             }
           }
-          //foreach (var environmentVariable in environmentVariables.GetType().GetProperties())
-          //{
-          //  string value = (string) environmentVariable.GetValue(environmentVariables, null);
-          //  process.StartInfo.EnvironmentVariables[environmentVariable.Name] = value;
-          //}
-
-          callback(new { data = "Set" });
            
           process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => {
             if (!String.IsNullOrEmpty(e.Data))
             {
               if (onDataReceivedEvent != null) {
-                onDataReceivedEvent(new { status = "error", data = e.Data });
+                onDataReceivedEvent(new { error = e.Data });
               }
             }
           };
@@ -117,12 +106,13 @@ namespace com.overwolf.net {
             if (!String.IsNullOrEmpty(e.Data))
             {
               if (onDataReceivedEvent != null) { 
-              onDataReceivedEvent(new { status = "success", data = e.Data });
-                }
+                onDataReceivedEvent(new { data = e.Data });
+              }
             }
           };
 
           process.Start();
+          ChildProcessTracker.AddProcess(process);
 
           process.BeginOutputReadLine();
           process.BeginErrorReadLine();
@@ -135,11 +125,9 @@ namespace com.overwolf.net {
 
           process.EnableRaisingEvents = true;
           process.Exited += ProcessExited;
-          
-          callback(new { status = "success", processId = process.Id });
-
+          callback(new { data = process.Id });
         } catch (Exception ex) {
-          callback(new { status = "error", data = "unknown exception: " + ex.ToString() });
+          callback(new { error = "unknown exception: " + ex.ToString() });
         }
       });
     }
@@ -165,7 +153,7 @@ namespace com.overwolf.net {
           Process process = null;
           lock (this) {
             if (!_running_process_.TryGetValue(processId, out process)) {
-              callback(new { status = "error", error = "can't find process: " + processId });
+              callback(new { error = "can't find process: " + processId });
               return;
             }
           }
@@ -183,9 +171,9 @@ namespace com.overwolf.net {
             CloseHandle(pOpenThread);
           }
 
-          callback(new { status = "success" });
+          callback(new { data = "success" });
         } catch (Exception ex) {
-          callback(new { status = "error", error = "unknown exception: " + ex.ToString() });
+          callback(new { error = "unknown exception: " + ex.ToString() });
         }
       });
     }
@@ -196,7 +184,7 @@ namespace com.overwolf.net {
           Process process = null;
           lock (this) {
             if (!_running_process_.TryGetValue(processId, out process)) {
-              callback(new { status = "error", error = "can't find process: " + processId });
+              callback(new { error = "can't find process: " + processId });
               return;
             }
           }
@@ -215,9 +203,9 @@ namespace com.overwolf.net {
 
             CloseHandle(pOpenThread);
           }
-          callback(new { status = "success" });
+          callback(new { data = "success" });
         } catch (Exception ex) {
-          callback(new { status = "error", error = "unknown exception: " + ex.ToString() });
+          callback(new { error = "unknown exception: " + ex.ToString() });
         }
       });
     }

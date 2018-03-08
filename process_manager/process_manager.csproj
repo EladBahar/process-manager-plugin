@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="child_process_tracker.cs" />
     <Compile Include="process_manager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

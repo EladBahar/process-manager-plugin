@@ -26,18 +26,17 @@ namespace test {
 
       ProcessManager.launchProcess(path, arguments, environmentVariables, hidden, (dynamic result) =>
       {
-        if (result.GetType().GetProperty("processId") != null)
+        if (result.GetType().GetProperty("data") != null)
         {
 
-          Console.WriteLine("Process ID: {0}", result.GetType().GetProperty("processId").GetValue(result, null));
-          processId = result.GetType().GetProperty("processId").GetValue(result, null);
+          Console.WriteLine("Process ID: {0}", result.GetType().GetProperty("data").GetValue(result, null));
+          processId = result.GetType().GetProperty("data").GetValue(result, null);
         }
         Console.WriteLine("Process: {0}", result);
       });
       Console.ReadLine();
-      ProcessManager.terminateProcess(processId);
+      //ProcessManager.terminateProcess(processId);
       Console.WriteLine("Exit");
-      Console.ReadLine();
     }
   }
 }
