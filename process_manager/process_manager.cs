@@ -59,7 +59,6 @@ namespace com.overwolf.net {
     // });
     public event Action<object> onDataReceivedEvent;
 
- 
     // path can be relative to the dll location or absolute
     public void launchProcess(string path, string arguments, object environmentVariables,
         bool hidden, Action<object> callback) {
@@ -80,6 +79,8 @@ namespace com.overwolf.net {
           process.StartInfo.WindowStyle = hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal;
           process.StartInfo.RedirectStandardOutput = true;
           process.StartInfo.RedirectStandardError = true;
+          process.StartInfo.RedirectStandardInput = true;
+          process.EnableRaisingEvents = true;
 
           if (environmentVariables != null) {
             try {
@@ -94,6 +95,7 @@ namespace com.overwolf.net {
           }
            
           process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => {
+            Console.WriteLine(e.Data);
             if (!String.IsNullOrEmpty(e.Data))
             {
               if (onDataReceivedEvent != null) {
@@ -103,6 +105,7 @@ namespace com.overwolf.net {
           };
           process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
           {
+            Console.WriteLine(e.Data);
             if (!String.IsNullOrEmpty(e.Data))
             {
               if (onDataReceivedEvent != null) { 
@@ -132,6 +135,27 @@ namespace com.overwolf.net {
       });
     }
 
+    public void sendTextToProcess(int processId, string text)
+    {
+      Task.Run(() => {
+        try
+        {
+          Process process = null;
+          lock (this)
+          {
+            if (!_running_process_.TryGetValue(processId, out process))
+              return;
+          }
+          StreamWriter streamWriter = process.StandardInput;
+          streamWriter.WriteLine(text);
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine(ex.ToString());
+        }
+      });
+    }
+
     public void terminateProcess(int processId) {
       Task.Run(() => {
         try {
@@ -142,7 +166,10 @@ namespace com.overwolf.net {
           }
           Console.WriteLine("Terminate {0}", processId);
           process.Kill();
-        } catch {
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine(ex.ToString());
         }
       });
     }
