@@ -67,7 +67,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="tests\start.bat" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\process_manager\process_manager.csproj">

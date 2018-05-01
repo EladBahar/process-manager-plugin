@@ -69,7 +69,7 @@ namespace com.overwolf.net {
             callback(new { error = "can't find path" });
             return;
           }
-
+    
           Process process = new Process();
 
           process.StartInfo.UseShellExecute = false;
@@ -80,7 +80,10 @@ namespace com.overwolf.net {
           process.StartInfo.RedirectStandardOutput = true;
           process.StartInfo.RedirectStandardError = true;
           process.StartInfo.RedirectStandardInput = true;
-          process.EnableRaisingEvents = true;
+          process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+          process.StartInfo.WorkingDirectory = new FileInfo(fullPath).Directory.FullName;
+          onDataReceivedEvent(new { data = process.StartInfo.WorkingDirectory });
+
 
           if (environmentVariables != null) {
             try {
@@ -95,7 +98,6 @@ namespace com.overwolf.net {
           }
            
           process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => {
-            Console.WriteLine(e.Data);
             if (!String.IsNullOrEmpty(e.Data))
             {
               if (onDataReceivedEvent != null) {
@@ -105,7 +107,6 @@ namespace com.overwolf.net {
           };
           process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
           {
-            Console.WriteLine(e.Data);
             if (!String.IsNullOrEmpty(e.Data))
             {
               if (onDataReceivedEvent != null) { 

